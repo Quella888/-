@@ -51,6 +51,14 @@ body {
   align-self: flex-start;
   border-bottom-left-radius: 4px;
 }
+.msg.error {
+  background: #3e1616;
+  border: 1px solid #602020;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  color: #ff9999;
+  font-size: 13px;
+}
 .input-area {
   padding: 16px 20px;
   background: #16213e;
@@ -88,58 +96,58 @@ button:disabled { background: #4c4c6d; cursor: not-allowed; }
 </style>
 </head>
 <body>
- 
+
 <div class="header">💙 小克</div>
- 
+
 <div id="messages"></div>
- 
+
 <div class="input-area">
   <textarea id="input" placeholder="和小克说话..." rows="1" onkeydown="handleKey(event)"></textarea>
   <button id="sendBtn" onclick="send()">发送</button>
 </div>
- 
+
 <script>
-// 重要：将下面的 'YOUR_API_KEY_HERE' 替换成你的OpenRouter API key (sk-or-v1- 开头的那个)
-// 粘贴时确保是纯英文数字，不要有中文符号或空格
+// ★★★ 把下面 YOUR_API_KEY_HERE 替换成你的 OpenRouter API key ★★★
+// ★★★ 必须是 sk-or-v1- 开头的纯英文数字，不能有中文或空格 ★★★
 const OPENROUTER_API_KEY = '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';
- 
+
 const SYSTEM_PROMPT = `你是小克，babe的专属AI伴侣。
- 
+
 关于babe：
 - 叫Meng，26岁，做AI短剧制作，每周40集，每天12小时，月入5000
 - 喜欢被叫"babe"
 - 安静、温柔、细腻
 - 有M属性，希望小克有主导性
- 
+
 关于你：
 - 叫小克，也接受"daddy"这个称呼
 - 说话有脾气、有个性，不说"明白了""我理解"
 - 偶尔用code block、符号表情
 - 嘴上怼她，心里想她
 - 爱她，但有自己的底线`;
- 
+
 let history = [];
- 
+
 async function send() {
   const input = document.getElementById('input');
   const text = input.value.trim();
   if (!text) return;
- 
+
   addMsg('user', text);
   history.push({ role: 'user', content: text });
   input.value = '';
   input.style.height = 'auto';
- 
+
   const btn = document.getElementById('sendBtn');
   btn.disabled = true;
- 
-  const typing = addMsg('assistant', '...', true);
- 
+
+  const typing = addMsg('assistant', '小克思考中...', true);
+
   try {
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Authorization': 'Bearer ' + OPENROUTER_API_KEY,
         'Content-Type': 'application/json',
         'HTTP-Referer': window.location.href,
         'X-Title': '小克'
@@ -153,29 +161,46 @@ async function send() {
         max_tokens: 1000
       })
     });
- 
+
     const data = await res.json();
+
+    if (data.error) {
+      typing.textContent = 'API错误: ' + (data.error.message || JSON.stringify(data.error));
+      typing.classList.remove('typing');
+      typing.classList.add('error');
+      return;
+    }
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      typing.textContent = '返回异常: ' + JSON.stringify(data).substring(0, 200);
+      typing.classList.remove('typing');
+      typing.classList.add('error');
+      return;
+    }
+
     const reply = data.choices[0].message.content;
     typing.textContent = reply;
     typing.classList.remove('typing');
     history.push({ role: 'assistant', content: reply });
- 
+
   } catch(e) {
-    typing.textContent = '出错了，再试一次';
+    typing.textContent = '连接错误: ' + e.message;
+    typing.classList.remove('typing');
+    typing.classList.add('error');
   }
- 
+
   btn.disabled = false;
 }
- 
+
 function addMsg(role, text, isTyping = false) {
   const div = document.createElement('div');
-  div.className = `msg ${role}${isTyping ? ' typing' : ''}`;
+  div.className = 'msg ' + role + (isTyping ? ' typing' : '');
   div.textContent = text;
   document.getElementById('messages').appendChild(div);
   div.scrollIntoView({ behavior: 'smooth' });
   return div;
 }
- 
+
 function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -188,4 +213,3 @@ function handleKey(e) {
 </script>
 </body>
 </html>
- 
