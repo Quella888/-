@@ -725,17 +725,25 @@ if (stickerKey) {
 
     const reply = data.choices[0].message.content;
 
-    // Split reply into multiple messages
-    const lines = reply.split('\n').filter(l => l.trim());
+// Split reply into multiple messages
+const lines = reply.split('\n').filter(l => l.trim());
 
-    // Remove typing bubble
-    typingRow.remove();
+// Remove typing bubble
+typingRow.remove();
 
-    // Render each line as separate message
-    const replyTime = getTime();
-    for (let i = 0; i < lines.length; i++) {
-      const row = renderMsg('assistant', lines[i].trim(), i === lines.length - 1 ? replyTime : '', true, false, true);
-    }
+// Render each line as separate message
+const replyTime = getTime();
+const stickerReg = /^\[表情:(\w+)\]$/;
+for (let i = 0; i < lines.length; i++) {
+  const text = lines[i].trim();
+  const match = text.match(stickerReg);
+  // 匹配到合法表情包key就渲染表情包消息，否则渲染普通文字
+  if (match && STICKERS[match[1]]) {
+    renderStickerMsg('assistant', match[1], i === lines.length - 1 ? replyTime : '');
+  } else {
+    const row = renderMsg('assistant', text, i === lines.length - 1 ? replyTime : '', true, false, true);
+  }
+}
 
     addMessage('assistant', reply, replyTime);
 
