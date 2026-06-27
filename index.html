@@ -627,7 +627,7 @@ async function send() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'openrouter/free',
+        model: 'agnes-2.0-flash',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           ...history
