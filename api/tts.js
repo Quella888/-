@@ -6,28 +6,26 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { text } = req.body;
-  if (!text || text.length > 2000) {
-    return res.status(400).json({ error: 'Text required, max 2000 chars' });
+  if (!text || text.length > 200) {
+    return res.status(400).json({ error: 'Text required, max 200 chars' });
   }
 
   try {
-    const { MsEdgeTTS, OUTPUT_FORMAT } = await import("msedge-tts");
-    const tts = new MsEdgeTTS();
-    await tts.setMetadata("zh-CN-YunxiNeural", OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+    const url = 'https://translate.google.com/translate_tts'
+      + '?ie=UTF-8&client=tw-ob&tl=zh-CN&q=' + encodeURIComponent(text);
 
-    const bufferResult = await new Promise((resolve, reject) => {
-      const chunks = [];
-      const stream = tts.toStream(text);
-      stream.on('data', (chunk) => {
-        if (Buffer.isBuffer(chunk)) chunks.push(chunk);
-      });
-      stream.on('end', () => resolve(Buffer.concat(chunks)));
-      stream.on('error', (err) => reject(err));
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0' }
     });
 
+    if (!response.ok) {
+      return res.status(500).json({ error: 'TTS source error: ' + response.status });
+    }
+
+    const buffer = Buffer.from(await response.arrayBuffer());
     res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Content-Length', bufferResult.length);
-    res.status(200).send(bufferResult);
+    res.setHeader('Content-Length', buffer.length);
+    res.status(200).send(buffer);
   } catch (e) {
     return res.status(500).json({ error: 'TTS failed: ' + e.message });
   }
