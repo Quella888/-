@@ -1,10 +1,17 @@
 export default async function handler(req, res) {
-  // CORS
+  // CORS 跨域配置
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // 预检请求直接放行
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   const { text } = req.body;
   if (!text || text.length > 2000) {
@@ -13,36 +20,51 @@ export default async function handler(req, res) {
 
   const FISH_API_KEY = process.env.FISH_API_KEY;
   if (!FISH_API_KEY) {
-    return res.status(500).json({ error: 'FISH_API_KEY not configured' });
+    return res.status(500).json({ error: 'FISH_API_KEY not configured in environment variable' });
   }
 
   const VOICE_MODEL_ID = 'ac919021b49a442dbc569cd92c1f3e4c';
+  // 设置20秒超时，防止请求卡死
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
 
   try {
     const response = await fetch('https://api.fish.audio/v1/tts', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + FISH_API_KEY,
+        'Authorization': `Bearer ${FISH_API_KEY}`,
         'Content-Type': 'application/json',
       },
+      signal: controller.signal,
       body: JSON.stringify({
-        text: text,
+        text,
         reference_id: VOICE_MODEL_ID,
         format: 'mp3',
         latency: 'normal',
       }),
     });
 
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
       const errText = await response.text();
-      return res.status(response.status).json({ error: 'Fish Audio API error: ' + errText });
+      return res.status(response.status).json({ error: `Fish Audio API error: ${errText}` });
     }
 
-    const audioBuffer = await response.arrayBuffer();
+    // 流式转发，不一次性加载全部音频到内存
     res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Content-Length', audioBuffer.byteLength);
-    res.status(200).send(Buffer.from(audioBuffer));
+    // 直接把上游流管道输出给前端
+    response.body.pipe(res);
+
+    // 监听流异常
+    response.body.on('error', (err) => {
+      console.error('Audio stream error:', err);
+      res.destroy();
+    });
+
   } catch (e) {
-    return res.status(500).json({ error: 'TTS request failed: ' + e.message });
+    clearTimeout(timeoutId);
+    const errMsg = e.name === 'AbortError' ? 'TTS request timeout' : e.message;
+    return res.status(500).json({ error: `TTS request failed: ${errMsg}` });
   }
 }
