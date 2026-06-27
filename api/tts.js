@@ -1,6 +1,4 @@
-import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -13,6 +11,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    const { MsEdgeTTS, OUTPUT_FORMAT } = await import("msedge-tts");
     const tts = new MsEdgeTTS();
     await tts.setMetadata("zh-CN-YunxiNeural", OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
     const readable = tts.toStream(text);
