@@ -29,7 +29,6 @@ export default async function handler(req, res) {
         reference_id: VOICE_MODEL_ID,
         format: 'mp3',
         latency: 'normal',
-        'model': 's2-pro'
       }),
     });
 
