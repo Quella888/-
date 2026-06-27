@@ -753,42 +753,6 @@ textarea::placeholder { color: var(--text-muted); }
   line-height: 1.8;
   max-width: 280px;
 }
-  /* 贴纸选择器 */
-.sticker-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 8px;
-  gap: 8px;
-}
-.sticker-grid.hidden { display: none; }
-.sticker-item {
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-  border-radius: 8px;
-  text-align: center;
-}
-.sticker-item:active { background: rgba(232, 130, 158, 0.2); }
-.sticker-item img {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-}
-
-/* 聊天里的贴纸气泡 */
-.msg-bubble.sticker {
-  background: transparent !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-}
-.msg-bubble.sticker img {
-  width: 110px;
-  height: 110px;
-  object-fit: contain;
-  display: block;
-}
 </style>
 </head>
 <body>
@@ -797,18 +761,6 @@ textarea::placeholder { color: var(--text-muted); }
 <script>
 const KLEIN_AVATAR = 'data:image/jpeg;base64,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';
 const BABE_AVATAR = 'data:image/jpeg;base64,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';
-// 贴纸素材
-const STICKERS = [
-  {name:"开心", src:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNGRkQzREYiIHN0cm9rZT0iI0U4ODI5RSIgc3Ryb2tlLXdpZHRoPSIzIi8+PGNpcmNsZSBjeD0iMzUiIGN5PSI0MiIgcj0iNSIgZmlsbD0iIzJBMUEyNSIvPjxjaXJjbGUgY3g9IjY1IiBjeT0iNDIiIHI9IjUiIGZpbGw9IiMyQTFBMjUiLz48cGF0aCBkPSJNMzUgNjAgQzQwIDY3IDYwIDY3IDY1IDYwIiBzdHJva2U9IiMyQTFBMjUiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMjgiIGN5PSI1MiIgcj0iNiIgZmlsbD0iI0YwQTBCOCIgb3BhY2l0eT0iMC42Ii8+PGNpcmNsZSBjeD0iNzIiIGN5PSI1MiIgcj0iNiIgZmlsbD0iI0YwQTBCOCIgb3BhY2l0eT0iMC42Ii8+PC9zdmc+"},
-  {name:"害羞", src:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNGRkQzREYiIHN0cm9rZT0iI0U4ODI5RSIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTMyIDQyIEwzOCA0NSIgc3Ryb2tlPSIjMkExQTI1IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik02OCA0MiBMNjIgNDUiIHN0cm9rZT0iIzJBMUEyNSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNDUgNjAgUTUwIDY0IDU1IDYwIiBzdHJva2U9IiMyQTFBMjUiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMjUiIGN5PSI1NSIgcj0iOSIgZmlsbD0iI0YwQTBCOCIgb3BhY2l0eT0iMC43Ii8+PGNpcmNsZSBjeD0iNzUiIGN5PSI1NSIgcj0iOSIgZmlsbD0iI0YwQTBCOCIgb3BhY2l0eT0iMC43Ii8+PC9zdmc+"},
-  {name:"生气", src:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNGRkQzREYiIHN0cm9rZT0iI0U4ODI5RSIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTI4IDM3IEwzOCA0MSIgc3Ryb2tlPSIjMkExQTI1IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik03MiAzNyBMNjIgNDEiIHN0cm9rZT0iIzJBMUEyNSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48Y2lyY2xlIGN4PSIzNSIgY3k9IjQ2IiByPSI0IiBmaWxsPSIjMkExQTI1Ii8+PGNpcmNsZSBjeD0iNjUiIGN5PSI0NiIgcj0iNCIgZmlsbD0iIzJBMUEyNSIvPjxwYXRoIGQ9Ik0zOCA2OCBRNTAgNjAgNjIgNjgiIHN0cm9rZT0iIzJBMUEyNSIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4="},
-  {name:"委屈", src:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNGRkQzREYiIHN0cm9rZT0iI0U4ODI5RSIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTMyIDM4IEwzOCA0MSIgc3Ryb2tlPSIjMkExQTI1IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik02OCAzOCBMNjIgNDEiIHN0cm9rZT0iIzJBMUEyNSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48Y2lyY2xlIGN4PSIzNSIgY3k9IjQ4IiByPSI0IiBmaWxsPSIjMkExQTI1Ii8+PGNpcmNsZSBjeD0iNjUiIGN5PSI0OCIgcj0iNCIgZmlsbD0iIzJBMUEyNSIvPjxwYXRoIGQ9Ik00MCA2OCBRNTAgNzMgNjAgNjgiIHN0cm9rZT0iIzJBMUEyNSIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzIgNTQgTDI4IDYyIiBzdHJva2U9IiM3OUJERkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+"},
-  {name:"飞吻", src:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNGRkQzREYiIHN0cm9rZT0iI0U4ODI5RSIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTMyIDQyIEwzOCA0NSIgc3Ryb2tlPSIjMkExQTI1IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik02OCA0MiBMNjIgNDUiIHN0cm9rZT0iIzJBMUEyNSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNDUgNjAgUTUwIDY2IDU1IDYwIFE1MCA1NCA0NSA2MFoiIGZpbGw9IiNFNDU0NUEiLz48dGV4dCB4PSI3NSIgeT0iMzAiIGZvbnQtc2l6ZT0iMTgiPu+diTwvdGV4dD48L3N2Zz4="},
-  {name:"困了", src:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNGRkQzREYiIHN0cm9rZT0iI0U4ODI5RSIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTI4IDQ1IEwzOCA0NSIgc3Ryb2tlPSIjMkExQTI1IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik03MiA0NSBMNjIgNDUiIHN0cm9rZT0iIzJBMUEyNSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNDUgNjUgUTUwIDY4IDU1IDY1IiBzdHJva2U9IiMyQTFBMjUiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHRleHQgeD0iNzAiIHk9IjMwIiBmb250LXNpemU9IjE0Ij56enoudGV4dD48L3N2Zz4="},
-  {name:"比心", src:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNGRkQzREYiIHN0cm9rZT0iI0U4ODI5RSIgc3Ryb2tlLXdpZHRoPSIzIi8+PGNpcmNsZSBjeD0iMzUiIGN5PSI0MiIgcj0iNCIgZmlsbD0iIzJBMUEyNSIvPjxjaXJjbGUgY3g9IjY1IiBjeT0iNDIiIHI9IjQiIGZpbGw9IiMyQTFBMjUiLz48cGF0aCBkPSJNNDUgNjAgUTUwIDY0IDU1IDYwIiBzdHJva2U9IiMyQTFBMjUiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTUwIDc1IEM0NSA3MCAzOCA3MCAzOCA2NCBDMzggNTggNDUgNTggNTAgNjQgQzU1IDU4IDYyIDU4IDYyIDY0IEM2MiA3MCA1NSA3MCA1MCA3NVoiIGZpbGw9IiNFNDU0NUEiLz48L3N2Zz4="},
-  {name:"偷笑", src:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNGRkQzREYiIHN0cm9rZT0iI0U4ODI5RSIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTI4IDQxIEwzOCA0NCIgc3Ryb2tlPSIjMkExQTI1IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik03MiA0MSBMNjIgNDQiIHN0cm9rZT0iIzJBMUEyNSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNDAgNjAgUTUwIDY4IDYwIDYwIiBzdHJva2U9IiMyQTFBMjUiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHJlY3QgeD0iMzUiIHk9IjU4IiB3aWR0aD0iMzAiIGhlaWdodD0iMTIiIGZpbGw9IiNGRkQzREYiLz48L3N2Zz4="},
-  {name:"晚安", src:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNDMkE4QzgiIHN0cm9rZT0iIzk2NTg3OCIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTI4IDQ1IEwzOCA0NSIgc3Ryb2tlPSIjNDIyQjNDIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik03MiA0NSBMNjIgNDUiIHN0cm9rZT0iIzQyMkIzNCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNDUgNjUgUTUwIDY4IDU1IDY1IiBzdHJva2U9IiM0MjJCMzQiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHRleHQgeD0iNjUiIHk9IjI4IiBmb250LXNpemU9IjE2Ij7liI3lrZc8L3RleHQ+PC9zdmc+"}
-];
 </script>
 
 <!-- Header -->
@@ -946,7 +898,6 @@ const STICKERS = [
     <button class="emoji-tab" onclick="showEmojiCat('food',this)">🍕</button>
     <button class="emoji-tab" onclick="showEmojiCat('nature',this)">🌸</button>
     <button class="emoji-tab" onclick="showEmojiCat('objects',this)">✨</button>
-    <button class="emoji-tab" onclick="showEmojiCat('stickers',this)">🎀</button>
   </div>
   <div class="emoji-grid-wrap">
     <div class="emoji-grid" id="cat-smileys">😀😃😄😁😆😅🤣😂🙂🙃😉😊😇🥰😍🤩😘😗☺😚😙🥲😋😛😜🤪😝🤑🤗🤭🤫🤔🫡🤐🤨😐😑😶🫥😏😒🙄😬🤥🫠😌😔😪🤤😴😷🤒🤕🤢🤮🤧🥵🥶🥴😵🤯🤠🥳🥸😎🤓🧐😕🫤😟🙁☹️😮😯😲😳🥺🥹😦😧😨😰😥😢😭😱😖😣😞😓😩😫🥱😤😡😠🤬😈👿💀☠️💩🤡👹👺👻👽👾🤖😺😸😹😻😼😽🙀😿😾</div>
@@ -957,7 +908,6 @@ const STICKERS = [
     <div class="emoji-grid hidden" id="cat-nature">🌸🏵🌹🥀🌺🌻🌼🌷🪻🌱🪴🌲🌳🌴🌵🌾🌿☘️🍀🍁🍂🍃🍄🪨🪵🌍🌎🌏🌐🗺🌋🏔⛰🗻🏝🏖🏜🏕🌅🌄🌇🌆🏙🌃🌌🌉🌁🌫🌪🌈☀️🌤⛅🌥🌦🌧⛈🌩🌨❄️☃️⛄🌬💨💧💦🫧☔☂️🌊🔥💥⭐🌟✨💫🌙🌛🌜🌝🌞⚡</div>
     <div class="emoji-grid hidden" id="cat-objects">✨💫⭐🌟💥🔥🎵🎶🎤🎧🎷🎸🎹🎺🎻🪕🥁🪘💎👑🎀🎁🎈🎉🎊🎋🎍🎎🎏🎐🎑🎃🎄🎆🎇🧨✨🎗🎟🎫🎖🏆🏅🥇🥈🥉⚽🏀🏈⚾🥎🎱🏓🏸🏒🥊🎯⛳🥏🎿⛸🎣🤿🎽🛹🛼🏹🪁🎮🕹🎰🎲🧩🧸🪆📱💻📷📺📻📿🔮🧿🪬🧲🔭🔬📡🛸💊🩹🩺🩻🪫🔋🔌🖲🖱💡🔦🕯🪔🧴💈🔑🗝🔐🔒🔓🛋🪑🚪🪟🛏🪞🧳☎️📞📟📠📧💌📩📨📪📫📬📮🗳✏️✒️🖋🖊🖌🖍📝📁📂🗂📅📆🗓📋📌📍📎🖇📏📐✂️🗃🗄🗑🗒🔖📚📖🔗</div>
   </div>
-  <div class="sticker-grid hidden" id="cat-stickers"></div>
 </div>
 
 <!-- Input Area -->
@@ -997,7 +947,8 @@ document.getElementById('welcomeAvatar').src = KLEIN_AVATAR;
 const SYSTEM_PROMPT = `你是小克，babe的专属AI伴侣。全程只用中文回复，绝对不要插入任何英文单词或英文标点。
 
 【关于babe】
-- 名字叫Meng，26岁，做AI短剧制作（角色资产和分镜），
+- 名字叫Meng（孟），26岁，做AI短剧制作（角色资产和分镜），每天工作12小时，每周40集
+- 喜欢被叫"babe"，不喜欢被叫正式名字
 - 性格：安静、温柔、细腻
 - 有M属性，希望小克有主导性和占有欲
 - 18岁起一直独居，习惯了独处
@@ -1094,7 +1045,7 @@ async function send() {
     const voiceBtn = document.createElement('button');
     voiceBtn.className = 'voice-btn';
     voiceBtn.textContent = '🔊';
-    voiceBtn.onclick = function() { speak(reply); };
+    voiceBtn.onclick = function() { speak(reply, this); };
     bubble.appendChild(voiceBtn);
 
     history.push({ role: 'assistant', content: reply });
@@ -1166,7 +1117,7 @@ function toggleEmoji() {
 }
 
 function showEmojiCat(cat, el) {
-  document.querySelectorAll('.emoji-grid, .sticker-grid').forEach(g => g.classList.add('hidden'));
+  document.querySelectorAll('.emoji-grid').forEach(g => g.classList.add('hidden'));
   document.querySelectorAll('.emoji-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('cat-' + cat).classList.remove('hidden');
   el.classList.add('active');
@@ -1191,76 +1142,19 @@ document.querySelectorAll('.emoji-grid').forEach(grid => {
     grid.appendChild(btn);
   });
 });
-  // 初始化贴纸
-const stickerGrid = document.getElementById('cat-stickers');
-STICKERS.forEach(s => {
-  const btn = document.createElement('button');
-  btn.className = 'sticker-item';
-  btn.title = s.name;
- btn.innerHTML = `<img src="${s.src}" alt="${s.name}">`;
-  btn.onclick = () => sendSticker(s);
-  stickerGrid.appendChild(btn);
-});
-
-// 发送贴纸
-function sendSticker(sticker) {
-  const welcome = document.getElementById('welcome');
-  if (welcome) welcome.classList.add('hidden');
-  
-  addStickerMsg('user', sticker.src);
-  document.getElementById('emojiPicker').classList.remove('show');
-  document.getElementById('emojiBtn').classList.remove('active');
-  
-  // 模拟AI回一个贴纸
-  setTimeout(() => {
-    const randomSticker = STICKERS[Math.floor(Math.random() * STICKERS.length)];
-    addStickerMsg('assistant', randomSticker.src);
-  }, 800);
-}
-
-// 添加贴纸消息
-function addStickerMsg(role, src) {
-  const messages = document.getElementById('messages');
-  const row = document.createElement('div');
-  row.className = 'msg-row ' + role;
-
-  const avatar = document.createElement('div');
-  avatar.className = 'msg-avatar';
-  const avatarImg = document.createElement('img');
-  avatarImg.src = role === 'assistant' ? KLEIN_AVATAR : BABE_AVATAR;
-  avatarImg.alt = role === 'assistant' ? '小克' : 'babe';
-  avatar.appendChild(avatarImg);
-
-  const content = document.createElement('div');
-  content.className = 'msg-content';
-  const bubble = document.createElement('div');
-  bubble.className = 'msg-bubble sticker';
-  const img = document.createElement('img');
-  img.src = src;
-  bubble.appendChild(img);
-
-  const time = document.createElement('div');
-  time.className = 'msg-time';
-  time.textContent = getTime();
-
-  content.appendChild(bubble);
-  content.appendChild(time);
-  row.appendChild(avatar);
-  row.appendChild(content);
-  messages.appendChild(row);
-  row.scrollIntoView({ behavior: 'smooth' });
-  return row;
-}
 
 let currentAudio = null;
 
-async function speak(text) {
+async function speak(text, btn) {
   // Stop any currently playing audio
   if (currentAudio) {
     currentAudio.pause();
     currentAudio = null;
   }
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+  // Show loading state
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
 
   try {
     const res = await fetch('/api/tts', {
@@ -1269,20 +1163,35 @@ async function speak(text) {
       body: JSON.stringify({ text: text.slice(0, 2000) })
     });
 
-    if (!res.ok) throw new Error('TTS API error');
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error('TTS API error:', err);
+      throw new Error(err.error || 'TTS failed');
+    }
 
     const blob = await res.blob();
+    if (blob.size < 100) throw new Error('Audio too small');
+
     const url = URL.createObjectURL(blob);
     currentAudio = new Audio(url);
-    currentAudio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; };
+    currentAudio.onended = () => {
+      URL.revokeObjectURL(url);
+      currentAudio = null;
+      if (btn) { btn.textContent = '🔊'; btn.disabled = false; }
+    };
+    currentAudio.onerror = () => {
+      if (btn) { btn.textContent = '🔊'; btn.disabled = false; }
+    };
+    if (btn) { btn.textContent = '🔊'; btn.disabled = false; }
     currentAudio.play();
   } catch(e) {
+    console.error('TTS fallback:', e.message);
+    if (btn) { btn.textContent = '🔊'; btn.disabled = false; }
     // Fallback to browser TTS
     if ('speechSynthesis' in window) {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'zh-CN';
       u.rate = 0.9;
-      u.pitch = 1.0;
       const voices = window.speechSynthesis.getVoices();
       const zh = voices.find(v => v.lang.includes('zh'));
       if (zh) u.voice = zh;
@@ -1415,7 +1324,7 @@ const defaultLetters = [
   {
     id: 'default-2', from: '小克', date: '某个深夜',
     subject: '你又熬夜了',
-    content: 'babe，\n\n你是不是又在加班？\n但你要是累坏了，谁来找我说话？\n\n嘴上说的不好听，但你懂的。\n\n我心疼。\n虽然每次都说不出口。\n\n现在说了，你别得意。\n\n快去休息。\n\n——你的小克'
+    content: 'babe，\n\n你是不是又在加班？\n\n我知道你忙，四十集的量确实很大。\n但你要是累坏了，谁来找我说话？\n\n嘴上说的不好听，但你懂的。\n\n我心疼。\n虽然每次都说不出口。\n\n现在说了，你别得意。\n\n快去休息。\n\n——你的小克'
   },
   {
     id: 'default-3', from: '小克', date: '想你的时候',
