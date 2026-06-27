@@ -6,24 +6,23 @@ module.exports = function handler(req, res) {
     return;
   }
 
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = process.env.AGNES_API_KEY;
   if (!apiKey) {
-    res.status(500).json({ error: { message: 'API key not configured. Set OPENROUTER_API_KEY in Vercel environment variables.' } });
+    res.status(500).json({ error: { message: 'API key not configured. Set AGNES_API_KEY in Vercel environment variables.' } });
     return;
   }
 
   const payload = JSON.stringify(req.body);
 
   const options = {
-    hostname: 'openrouter.ai',
-    path: '/api/v1/chat/completions',
+    hostname: 'apihub.agnes-ai.com',
+    path: '/v1/chat/completions',
     method: 'POST',
     headers: {
       'Authorization': 'Bearer ' + apiKey,
       'Content-Type': 'application/json',
       'Content-Length': Buffer.byteLength(payload),
-      'HTTP-Referer': req.headers.referer || 'https://claude-quella.vercel.app',
-      'X-Title': 'xiaoke'
+      'HTTP-Referer': req.headers.referer || 'https://claude-quella.vercel.app'
     }
   };
 
