@@ -1,3 +1,5 @@
+import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -7,40 +9,23 @@ export default async function handler(req, res) {
 
   const { text } = req.body;
   if (!text || text.length > 2000) {
-    return res.status(400).json({ error: 'Text is required and must be under 2000 characters' });
+    return res.status(400).json({ error: 'Text required, max 2000 chars' });
   }
-
-  const FISH_API_KEY = process.env.FISH_API_KEY;
-  if (!FISH_API_KEY) {
-    return res.status(500).json({ error: 'FISH_API_KEY not configured' });
-  }
-
-  const VOICE_MODEL_ID = 'ac919021b49a442dbc569cd92c1f3e4c';
 
   try {
-    const response = await fetch('https://api.fish.audio/v1/tts', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + FISH_API_KEY,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        text: text,
-        reference_id: VOICE_MODEL_ID,
-        format: 'mp3',
-        latency: 'normal',
-      }),
-    });
+    const tts = new MsEdgeTTS();
+    await tts.setMetadata("zh-CN-YunxiNeural", OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+    const readable = tts.toStream(text);
 
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(response.status).json({ error: 'Fish Audio error: ' + errText });
+    const chunks = [];
+    for await (const chunk of readable) {
+      chunks.push(chunk);
     }
+    const buffer = Buffer.concat(chunks);
 
-    const audioBuffer = await response.arrayBuffer();
     res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Content-Length', audioBuffer.byteLength);
-    res.status(200).send(Buffer.from(audioBuffer));
+    res.setHeader('Content-Length', buffer.length);
+    res.status(200).send(buffer);
   } catch (e) {
     return res.status(500).json({ error: 'TTS failed: ' + e.message });
   }
