@@ -642,17 +642,18 @@ function logMood(userText, aiText) {
 
 // ========== Send ==========
 async function send(stickerKey) {
-  const input = document.getElementById('input');
-  let text;
-  let isSticker = false;
+ const input = document.getElementById('input');
 
-  if (stickerKey) {
-    text = '[表情:' + STICKER_LABELS[stickerKey] + ']';
-    isSticker = true;
-  } else {
-    text = input.value.trim();
-    if (!text) return;
-  }
+let text = '';
+let isSticker = false;
+
+if (stickerKey) {
+  text = `[表情:${stickerKey}]`;
+  isSticker = true;
+} else {
+  text = input.value.trim();
+  if (!text) return;
+}
 
   document.getElementById('welcome').classList.add('hidden');
 
