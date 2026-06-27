@@ -1,28 +1,49 @@
-export default async function handler(req, res) {
+const https = require('https');
+
+module.exports = function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: { message: 'API key not configured' } });
+    res.status(500).json({ error: { message: 'API key not configured. Set OPENROUTER_API_KEY in Vercel environment variables.' } });
+    return;
   }
 
-  try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': req.headers.referer || 'https://claude-quella.vercel.app',
-        'X-Title': '小克'
-      },
-      body: JSON.stringify(req.body)
+  const payload = JSON.stringify(req.body);
+
+  const options = {
+    hostname: 'openrouter.ai',
+    path: '/api/v1/chat/completions',
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + apiKey,
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(payload),
+      'HTTP-Referer': req.headers.referer || 'https://claude-quella.vercel.app',
+      'X-Title': 'xiaoke'
+    }
+  };
+
+  const proxyReq = https.request(options, function (proxyRes) {
+    let body = '';
+    proxyRes.on('data', function (chunk) { body += chunk; });
+    proxyRes.on('end', function () {
+      try {
+        const data = JSON.parse(body);
+        res.status(proxyRes.statusCode).json(data);
+      } catch (e) {
+        res.status(502).json({ error: { message: 'Invalid response from API' } });
+      }
     });
+  });
 
-    const data = await response.json();
-    res.status(response.status).json(data);
-  } catch (e) {
-    res.status(500).json({ error: { message: e.message } });
-  }
-}
+  proxyReq.on('error', function (e) {
+    res.status(502).json({ error: { message: 'Proxy error: ' + e.message } });
+  });
+
+  proxyReq.write(payload);
+  proxyReq.end();
+};
