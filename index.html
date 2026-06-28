@@ -852,7 +852,7 @@ function updateTypingBubble(row, text, isError = false, addVoice = false) {
     const voiceBtn = document.createElement('button');
     voiceBtn.className = 'voice-btn';
     voiceBtn.textContent = '🔊';
-    voiceBtn.onclick = () => speak(text);
+    voiceBtn.onclick = function() { speak(text, this); };
     bubble.appendChild(voiceBtn);
   }
   scrollToBottom();
