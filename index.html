@@ -785,7 +785,7 @@ function renderMsg(role, text, time, scroll = true, isTyping = false, showVoice 
     const voiceBtn = document.createElement('button');
     voiceBtn.className = 'voice-btn';
     voiceBtn.textContent = '🔊';
-    voiceBtn.onclick = () => speak(text);
+   voiceBtn.onclick = function() { speak(text, this); };
     bubble.appendChild(voiceBtn);
   }
 
@@ -871,7 +871,7 @@ function updateTypingBubble(row, text, isError = false, addVoice = false) {
     const voiceBtn = document.createElement('button');
     voiceBtn.className = 'voice-btn';
     voiceBtn.textContent = '🔊';
-    voiceBtn.onclick = () => speak(text);
+   voiceBtn.onclick = function() { speak(text, this); };
     bubble.appendChild(voiceBtn);
   }
   scrollToBottom();
@@ -1002,23 +1002,86 @@ async function speak(text) {
   }
 
   // Fallback to browser TTS
+ let currentAudio = null;
+
+async function speak(text, btn) {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+
+  const originalText = btn ? btn.textContent : '';
+  if (btn) btn.textContent = '⏳';
+
+  try {
+    const res = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.slice(0, 200) })
+    });
+
+    if (!res.ok) {
+      if (btn) btn.textContent = '🔊';
+      fallbackSpeak(text);
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    currentAudio = new Audio(url);
+    currentAudio.onended = () => {
+      URL.revokeObjectURL(url);
+      currentAudio = null;
+      if (btn) btn.textContent = '🔊';
+    };
+    currentAudio.onerror = () => {
+      if (btn) btn.textContent = '🔊';
+      fallbackSpeak(text);
+    };
+    if (btn) btn.textContent = '🔊';
+    currentAudio.play();
+
+  } catch(e) {
+    if (btn) btn.textContent = '🔊';
+    fallbackSpeak(text);
+  }
+}
+
+function fallbackSpeak(text) {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'zh-CN';
     u.rate = 0.9;
-    u.pitch = 1.0;
     const voices = window.speechSynthesis.getVoices();
     const zh = voices.find(v => v.lang.includes('zh'));
     if (zh) u.voice = zh;
     window.speechSynthesis.speak(u);
   }
 }
+
 if ('speechSynthesis' in window) {
   window.speechSynthesis.getVoices();
   window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 }
 
+function fallbackSpeak(text) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'zh-CN';
+    u.rate = 0.9;
+    const voices = window.speechSynthesis.getVoices();
+    const zh = voices.find(v => v.lang.includes('zh'));
+    if (zh) u.voice = zh;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
 // ========== Diary Page ==========
 function renderDiary() {
   const container = document.getElementById('diaryContainer');
